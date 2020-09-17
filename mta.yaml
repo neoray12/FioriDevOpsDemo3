@@ -1,0 +1,50 @@
+_schema-version: "3.2"
+ID: FioriDevOpsDemo3
+version: 0.0.1
+modules:
+- name: fioridevopsdemo3-approuter
+  type: approuter.nodejs
+  path: fioridevopsdemo3-approuter
+  requires:
+  - name: FioriDevOpsDemo3_html_repo_runtime
+  parameters:
+    disk-quota: 256M
+    memory: 256M
+- name: FioriDevOpsDemo3_ui_deployer
+  type: com.sap.application.content
+  path: .
+  requires:
+  - name: FioriDevOpsDemo3_html_repo_host
+    parameters:
+      content-target: true
+  build-parameters:
+    build-result: resources
+    requires:
+    - artifacts:
+      - FioriDevOpsDemo3-content.zip
+      name: FioriDevOpsDemo3
+      target-path: resources/
+- name: FioriDevOpsDemo3
+  type: html5
+  path: FioriDevOpsDemo3
+  build-parameters:
+    builder: custom
+    commands:
+    - npm run build
+    supported-platforms: []
+resources:
+- name: FioriDevOpsDemo3_html_repo_runtime
+  type: org.cloudfoundry.managed-service
+  parameters:
+    service: html5-apps-repo
+    service-plan: app-runtime
+- name: FioriDevOpsDemo3_html_repo_host
+  type: org.cloudfoundry.managed-service
+  parameters:
+    service: html5-apps-repo
+    service-plan: app-host
+build-parameters:
+  before-all:
+  - builder: custom
+    commands:
+    - npm install
